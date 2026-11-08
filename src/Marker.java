@@ -58,7 +58,44 @@ public class Marker {
      * Example: a = "ACGTAC", b = "TTACGT", k = 4: the words of a are ACGT, CGTA, GTAC; only ACGT is in b, so the answer is 1.
      */
     public static int sharedWords(String a, String b, int k) {
-        // TODO Mission 4
-        return -1;
+        if (k <= 0) throw new IllegalArgumentException("Window length must be positive");
+        if (a.length() < k || b.length() < k) return 0;
+        long[] hashesB = windowHashes(b, k);
+        HashMap<Long, ArrayList<Integer>> positions = new HashMap<>();
+        for (int i = 0; i < hashesB.length; i++) {
+            positions.computeIfAbsent(hashesB[i], key -> new ArrayList<>()).add(i);
+        }
+        long[] hashesA = windowHashes(a, k);
+        int count = 0;
+        for (int i = 0; i < hashesA.length; i++) {
+            ArrayList<Integer> candidates = positions.get(hashesA[i]);
+            if (candidates == null) continue;
+            for (int start : candidates) {
+                int j = 0;
+                while (j < k && a.charAt(i + j) == b.charAt(start + j)) j++;
+                if (j == k) {
+                    count++;
+                    break;
+                }
+            }
+        }
+        return count;
+    }
+
+    private static long[] windowHashes(String s, int k) {
+        long base = 257;
+        long mod = 1_000_000_007;
+        long power = 1;
+        for (int i = 1; i < k; i++) power = power * base % mod;
+        long hash = 0;
+        for (int i = 0; i < k; i++) hash = (hash * base + s.charAt(i)) % mod;
+        long[] hashes = new long[s.length() - k + 1];
+        hashes[0] = hash;
+        for (int i = 1; i < hashes.length; i++) {
+            hash = (hash - s.charAt(i - 1) * power % mod + mod) % mod;
+            hash = (hash * base + s.charAt(i + k - 1)) % mod;
+            hashes[i] = hash;
+        }
+        return hashes;
     }
 }
