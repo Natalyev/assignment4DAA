@@ -37,7 +37,9 @@ The strains have 1117 and 1121 letters, the genome has 26656 letters, and the tr
 
 ## Lab screenshot
 
-The generated console is `output/outbreak.html`. The required screenshot `output/outbreak.png` still needs to be captured manually: the automation browser blocked opening the local file. Open the HTML, wait for its checks to finish, save a full-page screenshot under that name and commit it before submission.
+The screenshot below shows the lab console summary on my personal data. All five missions and all nine output values pass the lab checks. The interactive page is `output/outbreak.html`.
+
+![Patient Zero lab console: all nine results pass](output/outbreak.png)
 
 ## Questions
 

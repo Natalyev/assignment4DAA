@@ -4,4 +4,4 @@ Java compilation: --release 17.
 Overlaps, repeated windows and actual rolling-hash collisions pass.
 Supplied framework files unchanged.
 Personal run including HTML generation: 0.184 seconds.
-Browser screenshot: blocked by local file URL policy; still required.
+User-provided screenshot saved as output/outbreak.png: the visible lab summary confirms all nine results pass.
