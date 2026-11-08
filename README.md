@@ -4,6 +4,8 @@ Student ID: 252119
 Name: Nataliyev Daniyar  
 Group: SE-2536
 
+Repository: https://github.com/Natalyev/assignment4DAA
+
 Java 17 or newer. The project compares two virus strains, searches for a marker and chooses a minimum-cost set of people to test.
 
 ## Run
@@ -124,5 +126,5 @@ After running Check, run Main without arguments again: the example checks overwr
 - [x] Program output, timing table, complexity table and AI disclosure recorded.
 - [ ] Student has reviewed and revised the implementation and report.
 - [ ] Required screenshot saved as output/outbreak.png and committed.
-- [ ] Public GitHub repository created and main pushed.
+- [x] Project published on the main branch of the GitHub repository linked above.
 - [ ] Repository link submitted in Moodle before the deadline.
