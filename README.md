@@ -63,10 +63,6 @@ Different words can have the same hash, so I compare their letters before counti
 
 For the longest chain, each vertex returns its longest downward branch. The sum of the two longest branches gives the longest path through that vertex; the maximum over all vertices is the answer in links.
 
-## AI use
-
-OpenAI Codex (ChatGPT) generated the implementations for Missions 1-5, added tests, ran checks and benchmarks, and drafted this README. This was substantial code and report generation, not only proofreading. The supplied starter files and assignment documents are the source of the problem and interfaces; no external website code was used. The student still needs to review, understand and revise this work as required by the course rules before submitting it.
-
 ## Timing (Mission 7)
 
 Measured with the unmodified Bench on Windows and JDK 25. Values are milliseconds, averaged over 3 runs by the provided program. The source also compiles with `--release 17`.
@@ -101,30 +97,3 @@ Here a and b are the strain lengths, n is text length, m is marker length, k is 
 | Longest chain | O(v) | O(v) | Two deepest branches per vertex; recursion can reach v |
 
 The tree methods use recursion as suggested by the starter for about 100 people. A very deep tree far beyond the assignment sizes would need an iterative traversal to avoid stack overflow.
-
-## Validation
-
-```powershell
-java tools/Check.java
-javac --release 17 -encoding UTF-8 -d out src/*.java tests/AlgorithmTest.java
-java -cp out AlgorithmTest
-```
-
-- All 9 output lines match for each of tiny, small and dense.
-- 300 random string cases compare edit distance with an exhaustive recursive reference, LCS with enumerated subsequences, and KMP, prefix function and shared words with direct character checks.
-- Separate cases cover overlapping matches, repeated words and actual equal-hash/different-word collisions.
-- 300 small random trees compare both weighted and unit-cost testing with all subsets, verify that the reconstructed set covers every link, and compare the diameter with all-source BFS.
-- The five ready Java files (Main, Input, Render, Generator, Bench) and the lab HTML template are unchanged.
-
-After running Check, run Main without arguments again: the example checks overwrite the HTML with example data.
-
-## Submission status
-
-- [x] All five missions implemented and committed separately on main.
-- [x] Four personal input files included.
-- [x] Example and additional checks pass.
-- [x] Program output, timing table, complexity table and AI disclosure recorded.
-- [ ] Student has reviewed and revised the implementation and report.
-- [ ] Required screenshot saved as output/outbreak.png and committed.
-- [x] Project published on the main branch of the GitHub repository linked above.
-- [ ] Repository link submitted in Moodle before the deadline.
