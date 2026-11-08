@@ -1,75 +1,128 @@
 # Assignment 4. Patient Zero
 
-Student ID:
-Name:
-Group:
+Student ID: 252119  
+Name: Nataliyev Daniyar  
+Group: SE-2536
 
-This file is the report. Fill it in as you go. How to start: `START_HERE.md`. The task: `docs/Assignment4.pdf`.
+Java 17 or newer. The project compares two virus strains, searches for a marker and chooses a minimum-cost set of people to test.
+
+## Run
+
+Run from the patient-zero folder:
+
+```powershell
+javac -encoding UTF-8 -d out src/*.java
+java -cp out Main
+```
+
+Open `output/outbreak.html` in a browser. Personal input is included; to regenerate it, run `java tools/MakeVariant.java 252119 data`.
 
 ## Program output
 
-The 9 lines your program prints on your data (`java -cp out Main`):
+```text
+Mutations: 83
+Shared core: 1062
+Marker hits: 4
+First hit: 2265
+Border length: 4
+Shared words: 465
+Tests needed: 42
+Cheapest testing: 165
+Longest chain: 32
+```
 
-    Mutations:
-    Shared core:
-    Marker hits:
-    First hit:
-    Border length:
-    Shared words:
-    Tests needed:
-    Cheapest testing:
-    Longest chain:
+The strains have 1117 and 1121 letters, the genome has 26656 letters, and the tree has 90 people. Positions start at zero, shared words count starting positions in A, and the longest chain counts links rather than people.
 
-My outbreak report (a screenshot of `output/outbreak.html`):
+## Lab screenshot
 
-![outbreak](output/outbreak.png)
+The generated console is `output/outbreak.html`. The required screenshot `output/outbreak.png` still needs to be captured manually: the automation browser blocked opening the local file. Open the HTML, wait for its checks to finish, save a full-page screenshot under that name and commit it before submission.
 
 ## Questions
 
-Answer in your own words, two or three sentences each.
+### Mission 1
 
-Mission 1. What does the cell d[i][j] of your table mean, and how is it computed from other cells?
+`d[i][j]` is the minimum number of changes needed to turn the first i letters of A into the first j letters of B. I compare deletion from the cell above plus 1, insertion from the cell on the left plus 1, and replacement from the diagonal plus 1 (or plus 0 for equal letters). The first column is i and the first row is j because converting to or from an empty string requires deleting or inserting every letter.
 
-Mission 2. How is the longest common subsequence different from the longest common substring? My Shared core is bigger than the number of letters that are the same at the same place: why?
+### Mission 2
 
-Mission 3. What does the prefix function tell you, and why does the pointer in the text never go back in KMP? What is the Border length of my marker and what does it mean?
+A subsequence can skip letters, but it must keep their order; a substring must be consecutive. An insertion or deletion can shift matching letters to different positions, so checking only equal positions loses matches. For this input the LCS is 1062, while only 394 letters match at the same index.
 
-Mission 4. Why must you compare the letters after the hashes are equal? What happens to the cost of Rabin-Karp if many windows have the same hash?
+### Mission 3
 
-Mission 5. What are the two states of a person in your DP, and how do you get the answer for a person from its children? Why does a greedy "test the person with most links first" not always give the cheapest answer?
+`pi[i]` is the length of the longest proper prefix of the marker up to i that is also its suffix. On a mismatch KMP uses `pi[j - 1]` to keep the part already known to match, so the text pointer never goes backwards; after a full match the same fallback allows overlaps. My marker is `GAGATCGAGA`, and its border length is 4 because `GAGA` is both its beginning and its ending.
+
+### Mission 4
+
+Different words can have the same hash, so I compare their letters before counting a match. The hash map stores all B positions for each hash, and every matching A position counts once even if its word occurs several times in B. Rolling each hash takes constant time, but many false hash matches can require checking every pair of windows, taking up to O(a*b*k) time.
+
+### Mission 5
+
+`take[v]` is the minimum cost for the subtree when v is tested, and `skip[v]` is the minimum when v is not tested: take is `cost[v] + sum(min(take[child], skip[child]))`, while skip is `sum(take[child])`. I choose the smaller root state and rebuild the set: an untested parent forces every child to be tested, while a tested parent allows the cheaper child state. Choosing the person with most links can fail: in a star with three leaves, if the centre costs 100 and each leaf costs 1, testing the leaves costs 3 instead of 100.
+
+For the longest chain, each vertex returns its longest downward branch. The sum of the two longest branches gives the longest path through that vertex; the maximum over all vertices is the answer in links.
 
 ## AI use
 
-The syllabus requires you to say which AI tools you used and for what. Write the tool (ChatGPT, Copilot, other) and what you asked it: explain an idea, find an error, review code. Write "none" if you did not use any. If you took code or text from a book or a website, give the source here.
+OpenAI Codex (ChatGPT) generated the implementations for Missions 1-5, added tests, ran checks and benchmarks, and drafted this README. This was substantial code and report generation, not only proofreading. The supplied starter files and assignment documents are the source of the problem and interfaces; no external website code was used. The student still needs to review, understand and revise this work as required by the course rules before submitting it.
 
 ## Timing (Mission 7)
 
-Milliseconds, average of 3 runs, from `java -cp out Bench`.
+Measured with the unmodified Bench on Windows and JDK 25. Values are milliseconds, averaged over 3 runs by the provided program. The source also compiles with `--release 17`.
 
-| test | size | time |
-|---|---|---|
-| naive search | 20 000 / 40 000 / 80 000 | |
-| KMP | 20 000 / 40 000 / 80 000 | |
-| edit distance | 500 / 1000 / 2000 / 4000 | |
+| test | size | time (ms) |
+|---|---:|---:|
+| naive search | 20000 | 61.6 |
+| naive search | 40000 | 107.6 |
+| naive search | 80000 | 198.6 |
+| KMP | 20000 | 3.2 |
+| KMP | 40000 | 1.8 |
+| KMP | 80000 | 0.5 |
+| edit distance | 500 | 7.3 |
+| edit distance | 1000 | 6.6 |
+| edit distance | 2000 | 15.6 |
+| edit distance | 4000 | 75.0 |
 
-What do the numbers say about how the time grows? When you double the size, by how much does each time grow? Two or three sentences.
+The naive search nearly doubles here (about 1.75x and 1.85x) because the pattern length stays fixed at 2000, though its general worst-case cost is O(n*m), compared with O(n+m) for KMP. The small KMP measurements decrease because JVM warm-up and measurement noise dominate these short runs, so they do not demonstrate decreasing algorithmic complexity. Edit distance fills a quadratic table: doubling both string lengths should roughly quadruple the work, although the measured ratios (about 0.90x, 2.36x and 4.81x) also reflect warm-up, allocation and garbage collection.
 
 ## Complexity
 
-n is the length of the text (or of a strain), m the length of the pattern, k the length of the window, v the number of people. Fill in every algorithm you wrote.
+Here a and b are the strain lengths, n is text length, m is marker length, k is window length, h is the number of hits, and v is the number of people. Space includes the returned results and recursion stack where applicable.
 
 | algorithm | time | space | assumptions |
 |---|---|---|---|
-| Edit distance | | | |
-| LCS | | | |
-| Prefix function and KMP | | | |
-| Rabin-Karp (shared words) | | | |
-| Tree DP | | | |
+| Edit distance | O(a*b) | O(a*b) | Full table; precisely O((a+1)(b+1)) including empty inputs |
+| LCS | O(a*b) | O(a*b) | Same table dimensions; constant work per cell |
+| Prefix function | O(m) | O(m) | Fallbacks use earlier prefix values |
+| KMP including prefix function | O(n+m) | O(m+h) | All hits stored; overlaps included |
+| Rabin-Karp shared words | Expected O(a+b+a*k); worst O(a+b+a*b*k) | O(a+b) | Expected constant hash-map lookup and few false collisions; each candidate can need k comparisons; k=12 here |
+| Tree testing DP and reconstruction | O(v) | O(v) | Valid tree; each link processed a constant number of times |
+| Longest chain | O(v) | O(v) | Two deepest branches per vertex; recursion can reach v |
 
-## Before you submit
+The tree methods use recursion as suggested by the starter for about 100 people. A very deep tree far beyond the assignment sizes would need an iterative traversal to avoid stack overflow.
 
-- The four files in `data` and the screenshot `output/outbreak.png` are in the repository.
-- `java tools/Check.java` shows all examples right.
-- This README is filled in, the program output and the section AI use included.
-- The work is pushed to main (at least one commit per mission) and the repository is public.
-- The link is attached in Moodle.
+## Validation
+
+```powershell
+java tools/Check.java
+javac --release 17 -encoding UTF-8 -d out src/*.java tests/AlgorithmTest.java
+java -cp out AlgorithmTest
+```
+
+- All 9 output lines match for each of tiny, small and dense.
+- 300 random string cases compare edit distance with an exhaustive recursive reference, LCS with enumerated subsequences, and KMP, prefix function and shared words with direct character checks.
+- Separate cases cover overlapping matches, repeated words and actual equal-hash/different-word collisions.
+- 300 small random trees compare both weighted and unit-cost testing with all subsets, verify that the reconstructed set covers every link, and compare the diameter with all-source BFS.
+- The five ready Java files (Main, Input, Render, Generator, Bench) and the lab HTML template are unchanged.
+
+After running Check, run Main without arguments again: the example checks overwrite the HTML with example data.
+
+## Submission status
+
+- [x] All five missions implemented and committed separately on main.
+- [x] Four personal input files included.
+- [x] Example and additional checks pass.
+- [x] Program output, timing table, complexity table and AI disclosure recorded.
+- [ ] Student has reviewed and revised the implementation and report.
+- [ ] Required screenshot saved as output/outbreak.png and committed.
+- [ ] Public GitHub repository created and main pushed.
+- [ ] Repository link submitted in Moodle before the deadline.

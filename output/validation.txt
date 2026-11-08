@@ -1,0 +1,7 @@
+All 27 expected example values pass.
+Java compilation: --release 17.
+300 random string cases and 300 exhaustive small-tree cases pass.
+Overlaps, repeated windows and actual rolling-hash collisions pass.
+Supplied framework files unchanged.
+Personal run including HTML generation: 0.184 seconds.
+Browser screenshot: blocked by local file URL policy; still required.

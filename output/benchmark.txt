@@ -1,0 +1,8 @@
+Bench, JDK 25, Windows. Milliseconds, average of 3 runs.
+text 20000: naive 61.6, KMP 3.2
+text 40000: naive 107.6, KMP 1.8
+text 80000: naive 198.6, KMP 0.5
+edit distance length 500: 7.3
+edit distance length 1000: 6.6
+edit distance length 2000: 15.6
+edit distance length 4000: 75.0
