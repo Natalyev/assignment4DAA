@@ -17,8 +17,34 @@ public class Outbreak {
      * Main calls this twice: with all costs equal to 1 (the line "Tests needed") and with the real costs ("Cheapest testing").
      */
     public static boolean[] cheapestTests(int n, int[][] nb, int[] cost) {
-        // TODO Mission 5a
-        return new boolean[n];
+        boolean[] tested = new boolean[n];
+        if (n == 0) return tested;
+        long[] take = new long[n];
+        long[] skip = new long[n];
+        testingCosts(0, -1, nb, cost, take, skip);
+        rebuild(0, -1, take[0] <= skip[0], nb, take, skip, tested);
+        return tested;
+    }
+
+    private static void testingCosts(int v, int parent, int[][] nb, int[] cost,
+                                     long[] take, long[] skip) {
+        take[v] = cost[v];
+        for (int child : nb[v]) {
+            if (child == parent) continue;
+            testingCosts(child, v, nb, cost, take, skip);
+            take[v] += Math.min(take[child], skip[child]);
+            skip[v] += take[child];
+        }
+    }
+
+    private static void rebuild(int v, int parent, boolean chosen, int[][] nb,
+                                long[] take, long[] skip, boolean[] tested) {
+        tested[v] = chosen;
+        for (int child : nb[v]) {
+            if (child == parent) continue;
+            boolean chooseChild = !chosen || take[child] <= skip[child];
+            rebuild(child, v, chooseChild, nb, take, skip, tested);
+        }
     }
 
     /**
@@ -27,7 +53,26 @@ public class Outbreak {
      * Example: a line 0-1-2-3 has chain 3; a star with centre 0 and leaves 1, 2, 3 has chain 2.
      */
     public static int longestChain(int n, int[][] nb) {
-        // TODO Mission 5b
-        return -1;
+        if (n == 0) return 0;
+        int[] best = new int[1];
+        depth(0, -1, nb, best);
+        return best[0];
+    }
+
+    private static int depth(int v, int parent, int[][] nb, int[] best) {
+        int first = 0;
+        int second = 0;
+        for (int child : nb[v]) {
+            if (child == parent) continue;
+            int length = depth(child, v, nb, best) + 1;
+            if (length > first) {
+                second = first;
+                first = length;
+            } else if (length > second) {
+                second = length;
+            }
+        }
+        best[0] = Math.max(best[0], first + second);
+        return first;
     }
 }
